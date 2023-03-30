@@ -1,23 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import Menu from "./components/menu/Menu";
+import ToDoDay from "./components/menu/toDo/ToDoDay";
+
 
 function App() {
+  const [globalData, setGlobalData] = useState([]);
+
+  const updateData = (newData) => {
+    const isDayExist = globalData.find((el) => el.day === newData.weekDay);
+  
+    let updatedData = [];
+  
+    if(isDayExist) {
+      updatedData = globalData.map(el => {
+        return {...el, toDoItems: [...el.toDoItems, {
+          howImportant: newData.howImportant,
+          toDo: newData.toDo,
+          id: Date.now()
+        }]}
+      })
+    } else {
+      updatedData = [...globalData, {
+        day: newData.weekDay,
+        toDoItems: [{
+          howImportant: newData.howImportant,
+          toDo: newData.toDo,
+          id: Date.now()
+        }]
+      }]
+    }
+    setGlobalData(updatedData);
+  }
+ 
+  console.log('globalData------------------', globalData)
+ 
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Menu updateGlobalData={updateData}/>
+      {globalData.map((el) => <ToDoDay 
+                                  weekDay={el.day} 
+                                  toDoItems={el.toDoItems}
+                                  key={el.day} />)}
     </div>
   );
 }
